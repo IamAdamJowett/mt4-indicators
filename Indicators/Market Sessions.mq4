@@ -4,8 +4,8 @@
    NAME: Market Sessions.mq4
    
    AUTHOR: Adam Jowett
-   VERSION: 1.1.0
-   DATE: 10 March 2014
+   VERSION: 1.2.0
+   DATE: 28 May 2014
    METAQUOTES LANGUAGE VERSION: 4.0
    UPDATES & MORE DETAILED DOCUMENTATION AT: 
    http://adamjowett.com/2012/04/market-sessions-metatrader-indicator/
