@@ -56,7 +56,11 @@ extern color      newYorkColour = Gold;
 extern color      futureSessionColour = DimGray;
 
 string prefix = "market_sessions_";
-int sessionLength;
+int lastSydneySession = -1;
+int lastTokyoSession = -1;
+int lastLondonSession = -1;
+int lastNewYorkSession = -1;
+int sessionLength = 0;
 
 int init()
 {
