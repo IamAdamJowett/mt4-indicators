@@ -8,5 +8,6 @@
 /Images/
 /Experts/
 /Scripts/
+/Indicators/VMA*
 /Indicators/mqlcache*
 *.ex4
