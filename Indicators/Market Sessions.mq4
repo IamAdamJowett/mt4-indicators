@@ -199,7 +199,7 @@ void drawFutureSession(datetime prevSession, string label)
    drawVerticalLine(prefix + "future_line" + prevSession, futureTime, 1, futureSessionColour, 4, true, label);
 }
 
-void drawVerticalLine(string name, double time, int thickness, color colour, int style, bool background, string label = "") 
+void drawVerticalLine(string name, datetime time, int thickness, color colour, int style, bool background, string label = "") 
 { 
    if (ObjectFind(name) != 0) 
    {
