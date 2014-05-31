@@ -34,7 +34,7 @@
    SOFTWARE.
 */
 
-#property copyright "Copyright © 2012, Adam Jowett"
+#property copyright "Copyright © 2014, Adam Jowett"
 #property link      "http://adamjowett.com"
 
 #property indicator_chart_window
@@ -45,13 +45,15 @@ extern int        tokyo = 0;
 extern int        london = 7;
 extern int        newyork = 12;
 extern int        gmtServerOffset = 20;
+extern bool       showFutureSessions = true;
 extern bool       showOpenPrice = true;
-extern color      openColour = LimeGreen;
-extern color      closeColour = Red;
+extern bool       showPreviousRange = true;
+extern int        maxTimeframe = PERIOD_M15;
 extern color      tokyoColour = DeepSkyBlue;
 extern color      sydneyColour = Plum;
 extern color      londonColour = Magenta;
 extern color      newYorkColour = Gold;
+extern color      futureSessionColour = DimGray;
 
 string prefix = "market_sessions_";
 int sessionLength;
