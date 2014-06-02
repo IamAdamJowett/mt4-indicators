@@ -200,33 +200,13 @@ int start()
    }
    
    if (showFutureSessions) {
-      /**\/
-      if (DayOfWeek() == 1) { // if on a Monday, weekends throw things out
-         drawFutureSession(lastSydneySession + oneDay, "Sydney open");
-         drawFutureSession(lastTokyoSession + oneDay - oneHour * (MathAbs(sydney - tokyo)), "Tokyo open");
-         drawFutureSession(lastLondonSession + oneDay - oneHour * (MathAbs(sydney - london)), "London open");
-         drawFutureSession(lastSydneySession + oneDay - oneHour * (MathAbs(sydney - newyork)), "New York open");
-      } else {
-         drawFutureSession(lastSydneySession + oneDay, "Sydney open");
-         drawFutureSession(lastTokyoSession + oneDay, "Tokyo open");
-         drawFutureSession(lastLondonSession + oneDay, "London open");
-         drawFutureSession(lastNewYorkSession + oneDay, "New York open");
-      } 
-      /**/
-      
-      drawFutureSession(lastSydneySession + oneDay, "Sydney open");
-      drawFutureSession(lastTokyoSession + oneDay, "Tokyo open");
-      drawFutureSession(lastLondonSession + oneDay, "London open");
-      drawFutureSession(lastNewYorkSession + oneDay, "New York open");
+	  drawVerticalLine(prefix + "future_line_sydney", lastSydneySession + oneDay, 1, futureSessionColour, 4, true, "Sydney open");
+	  drawVerticalLine(prefix + "future_line_tokyo", lastTokyoSession + oneDay, 1, futureSessionColour, 4, true, "Tokyo open");
+	  drawVerticalLine(prefix + "future_line_london", lastLondonSession + oneDay, 1, futureSessionColour, 4, true, "London open");
+	  drawVerticalLine(prefix + "future_line_newyork", lastNewYorkSession + oneDay, 1, futureSessionColour, 4, true, "New York open");
    }
 
    return(0);
-}
-
-void drawFutureSession(datetime prevSession, string label) 
-{
-   datetime futureTime = prevSession;
-   drawVerticalLine(prefix + "future_line" + prevSession, futureTime, 1, futureSessionColour, 4, true, label);
 }
 
 void drawVerticalLine(string name, datetime time, int thickness, color colour, int style, bool background, string label = "") 
