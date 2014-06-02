@@ -61,8 +61,8 @@ int lastTokyoSession = -1;
 int lastLondonSession = -1;
 int lastNewYorkSession = -1;
 int sessionLength = 0;
-int oneHour = 60 * 60; // 60 seconds x 60 minutes = 1 hour
-int oneDay = oneHour * 24;
+int oneHour = 3600; // 60 seconds x 60 minutes = 1 hour
+int oneDay = 86400; // oneHour * 24;
 
 int init()
 {
@@ -198,8 +198,6 @@ int start()
       
       i--;      
    }
-   
-   Comment(iBarShift(NULL, 0, lastNewYorkSession));
    
    if (showFutureSessions) {
       /**\/
