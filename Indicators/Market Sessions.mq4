@@ -61,6 +61,8 @@ int lastTokyoSession = -1;
 int lastLondonSession = -1;
 int lastNewYorkSession = -1;
 int sessionLength = 0;
+int oneHour = 60 * 60; // 60 seconds x 60 minutes = 1 hour
+int oneDay = oneHour * 24;
 
 int init()
 {
@@ -121,73 +123,96 @@ int start()
    int timeRange = 0;
    double rangeHigh = 0;
    double rangeLow = 0;
+   double rangeMid = 0;
    
    while (i >= 0)
    {
       int currentTime = Time[i];
       int dayNumber = TimeDayOfWeek(currentTime) + 1;
       
-      if (TimeHour(currentTime) == sydney && TimeMinute(currentTime) == 0 && sydney > -1)
+      if (TimeHour(currentTime) == sydney && TimeMinute(currentTime) == 0)
       {
          ObjectDelete(prefix + "future_line" + lastSydneySession);
          lastSydneySession = currentTime;
-         drawVerticalLine(prefix + "sydneyTimeOpen"+i, currentTime, 1, sydneyColour, 3, true, "Sydney open");
-         if (showOpenPrice) drawTrendLine(prefix +"sydneyopen" + i, currentTime, currentTime + sessionLength, Open[i], Open[i], 1, sydneyColour, 4, true, false, DoubleToStr(Open[i], Digits));
-         if (showPreviousRange) {
-            timeRange = iBarShift(NULL, 0, lastNewYorkSession) - iBarShift(NULL, 0, currentTime) - 1;
-            rangeHigh = High[iHighest(NULL, 0, MODE_HIGH, timeRange, i + 1)];
-            rangeLow = Low[iLowest(NULL, 0, MODE_LOW, timeRange, i + 1)];
-            
-            drawTrendLine(prefix + "nyRangeHigh" + i, currentTime, currentTime + sessionLength, rangeHigh, rangeHigh, 1, DimGray, 2, true, false, "");
-            drawTrendLine(prefix + "nyRangeLow" + i, currentTime, currentTime + sessionLength, rangeLow, rangeLow, 1, DimGray, 2, true, false, ""); 
+         
+         if (sydney > -1) {
+            drawVerticalLine(prefix + "sydneyTimeOpen"+i, currentTime, 1, sydneyColour, 3, true, "Sydney open");
+            if (showOpenPrice) drawTrendLine(prefix +"sydneyopen" + i, currentTime, currentTime + sessionLength, Open[i], Open[i], 1, sydneyColour, 4, true, false, DoubleToStr(Open[i], Digits));
+            if (showPreviousRange) {
+               timeRange = iBarShift(NULL, 0, lastNewYorkSession) - iBarShift(NULL, 0, currentTime) - 1;
+               rangeHigh = High[iHighest(NULL, 0, MODE_HIGH, timeRange, i + 1)];
+               rangeLow = Low[iLowest(NULL, 0, MODE_LOW, timeRange, i + 1)];
+   			   rangeMid = rangeLow + (rangeHigh - rangeLow) / 2;
+               
+               drawTrendLine(prefix + "nyRangeHigh" + i, currentTime, currentTime + sessionLength, rangeHigh, rangeHigh, 1, DimGray, 2, true, false, "");
+               drawTrendLine(prefix + "nyRangeLow" + i, currentTime, currentTime + sessionLength, rangeLow, rangeLow, 1, DimGray, 2, true, false, ""); 
+            }
          }
       } 
-      else if ((TimeHour(currentTime) == tokyo && TimeMinute(currentTime) == 0) && tokyo > -1)
+      else if (TimeHour(currentTime) == tokyo && TimeMinute(currentTime) == 0)
       {
          ObjectDelete(prefix + "future_line" + lastTokyoSession);
          lastTokyoSession = currentTime;
-         drawVerticalLine(prefix + "line"+i, currentTime, 1, tokyoColour, 3, true, "Tokyo open");
-         if (showOpenPrice) drawTrendLine(prefix +"tokyoopen" + i, currentTime, currentTime + sessionLength, Open[i], Open[i], 1, tokyoColour, 4, true, false, DoubleToStr(Open[i], Digits));
+         
+         if (tokyo > -1) {
+            drawVerticalLine(prefix + "line"+i, currentTime, 1, tokyoColour, 3, true, "Tokyo open");
+            if (showOpenPrice) drawTrendLine(prefix +"tokyoopen" + i, currentTime, currentTime + sessionLength, Open[i], Open[i], 1, tokyoColour, 4, true, false, DoubleToStr(Open[i], Digits));
+         }
       }
-      else if ((TimeHour(currentTime) == london && TimeMinute(currentTime) == 0) && london > -1)
+      else if (TimeHour(currentTime) == london && TimeMinute(currentTime) == 0)
       {
          ObjectDelete(prefix + "future_line" + lastLondonSession);
          lastLondonSession = currentTime;
-         drawVerticalLine(prefix + "line"+i, currentTime, 1, londonColour, 3, true, "London open");
-         if (showOpenPrice) drawTrendLine(prefix +"londonoopen" + i, currentTime, currentTime + sessionLength, Open[i], Open[i], 1, londonColour, 4, true, false, DoubleToStr(Open[i], Digits));
-         if (showPreviousRange) {
-            timeRange = iBarShift(NULL, 0, lastSydneySession) - iBarShift(NULL, 0, currentTime) - 1;
-            rangeHigh = High[iHighest(NULL, 0, MODE_HIGH, timeRange, i + 1)];
-            rangeLow = Low[iLowest(NULL, 0, MODE_LOW, timeRange, i + 1)];
-            
-            drawTrendLine(prefix + "asianRangeHigh" + i, currentTime, currentTime + sessionLength, rangeHigh, rangeHigh, 1, DimGray, 2, true, false, "");
-            drawTrendLine(prefix + "asianRangeLow" + i, currentTime, currentTime + sessionLength, rangeLow, rangeLow, 1, DimGray, 2, true, false, ""); 
+         
+         if (london > -1) {
+            drawVerticalLine(prefix + "line"+i, currentTime, 1, londonColour, 3, true, "London open");
+            if (showOpenPrice) drawTrendLine(prefix +"londonoopen" + i, currentTime, currentTime + sessionLength, Open[i], Open[i], 1, londonColour, 4, true, false, DoubleToStr(Open[i], Digits));
+            if (showPreviousRange) {
+               timeRange = iBarShift(NULL, 0, lastSydneySession) - iBarShift(NULL, 0, currentTime) - 1;
+               rangeHigh = High[iHighest(NULL, 0, MODE_HIGH, timeRange, i + 1)];
+               rangeLow = Low[iLowest(NULL, 0, MODE_LOW, timeRange, i + 1)];
+               
+               drawTrendLine(prefix + "asianRangeHigh" + i, currentTime, currentTime + sessionLength, rangeHigh, rangeHigh, 1, DimGray, 2, true, false, "");
+               drawTrendLine(prefix + "asianRangeLow" + i, currentTime, currentTime + sessionLength, rangeLow, rangeLow, 1, DimGray, 2, true, false, ""); 
+            }
          }
       }
-      else if ((TimeHour(currentTime) == newyork && TimeMinute(currentTime) == 0) && newyork > -1)
+      else if (TimeHour(currentTime) == newyork && TimeMinute(currentTime) == 0)
       {
          ObjectDelete(prefix + "future_line" + lastNewYorkSession);
          lastNewYorkSession = currentTime;
-         drawVerticalLine(prefix + "line"+i, currentTime, 1, newYorkColour, 3, true, "New York open");
-         if (showOpenPrice) drawTrendLine(prefix +"newyorkopen" + i, currentTime, currentTime + sessionLength, Open[i], Open[i], 1, newYorkColour, 4, true, false, DoubleToStr(Open[i], Digits));
-         if (showPreviousRange) {
-            timeRange = iBarShift(NULL, 0, lastLondonSession) - iBarShift(NULL, 0, currentTime) - 1;
-            rangeHigh = High[iHighest(NULL, 0, MODE_HIGH, timeRange, i + 1)];
-            rangeLow = Low[iLowest(NULL, 0, MODE_LOW, timeRange, i + 1)];
-            
-            drawTrendLine(prefix + "ukRangeHigh" + i, currentTime, currentTime + sessionLength, rangeHigh, rangeHigh, 1, DimGray, 2, true, false, "");
-            drawTrendLine(prefix + "ukRangeLow" + i, currentTime, currentTime + sessionLength, rangeLow, rangeLow, 1, DimGray, 2, true, false, ""); 
+         
+         if (newyork > -1) {
+            drawVerticalLine(prefix + "line"+i, currentTime, 1, newYorkColour, 3, true, "New York open");
+            if (showOpenPrice) drawTrendLine(prefix +"newyorkopen" + i, currentTime, currentTime + sessionLength, Open[i], Open[i], 1, newYorkColour, 4, true, false, DoubleToStr(Open[i], Digits));
+            if (showPreviousRange) {
+               timeRange = iBarShift(NULL, 0, lastLondonSession) - iBarShift(NULL, 0, currentTime) - 1;
+               rangeHigh = High[iHighest(NULL, 0, MODE_HIGH, timeRange, i + 1)];
+               rangeLow = Low[iLowest(NULL, 0, MODE_LOW, timeRange, i + 1)];
+               
+               drawTrendLine(prefix + "ukRangeHigh" + i, currentTime, currentTime + sessionLength, rangeHigh, rangeHigh, 1, DimGray, 2, true, false, "");
+               drawTrendLine(prefix + "ukRangeLow" + i, currentTime, currentTime + sessionLength, rangeLow, rangeLow, 1, DimGray, 2, true, false, ""); 
+            }
          }
       }
       
-      i--;
+      i--;      
    }
    
+   Comment(iBarShift(NULL, 0, lastNewYorkSession));
+   
    if (showFutureSessions) {
-      drawFutureSession(lastSydneySession, "Sydney open");
-      drawFutureSession(lastTokyoSession, "Tokyo open");
-      drawFutureSession(lastLondonSession, "London open");
-      drawFutureSession(lastNewYorkSession, "New York open");
+      if (DayOfWeek() == 1) { // if on a Monday, weekends throw things out
+         drawFutureSession(lastSydneySession + oneDay, "Sydney open");
+         drawFutureSession(lastTokyoSession + oneDay - oneHour * (MathAbs(sydney - tokyo)), "Tokyo open");
+         drawFutureSession(lastLondonSession + oneDay - oneHour * (MathAbs(sydney - london)), "London open");
+         drawFutureSession(lastSydneySession + oneDay - oneHour * (MathAbs(sydney - newyork)), "New York open");
+      } else {
+         drawFutureSession(lastSydneySession + oneDay, "Sydney open");
+         drawFutureSession(lastTokyoSession + oneDay, "Tokyo open");
+         drawFutureSession(lastLondonSession + oneDay, "London open");
+         drawFutureSession(lastNewYorkSession + oneDay, "New York open");
+      } 
    }
 
    return(0);
@@ -195,7 +220,7 @@ int start()
 
 void drawFutureSession(datetime prevSession, string label) 
 {
-   datetime futureTime = prevSession + 86400;
+   datetime futureTime = prevSession;
    drawVerticalLine(prefix + "future_line" + prevSession, futureTime, 1, futureSessionColour, 4, true, label);
 }
 
