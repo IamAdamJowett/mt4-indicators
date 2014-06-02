@@ -4,11 +4,11 @@
    NAME: Market Sessions.mq4
    
    AUTHOR: Adam Jowett
-   VERSION: 1.2.0
-   DATE: 28 May 2014
+   VERSION: 1.2.2
+   DATE: 02 June 2014
    METAQUOTES LANGUAGE VERSION: 4.0
    UPDATES & MORE DETAILED DOCUMENTATION AT: 
-   http://adamjowett.com/2012/04/market-sessions-metatrader-indicator/
+   http://adamjowett.com/2014/05/market-sessions-indicator-new/
    ________________________________________________________________________________
 
    The MIT License (MIT)
@@ -61,8 +61,8 @@ int lastTokyoSession = -1;
 int lastLondonSession = -1;
 int lastNewYorkSession = -1;
 int sessionLength = 0;
-int oneHour = 60 * 60; // 60 seconds x 60 minutes = 1 hour
-int oneDay = oneHour * 24;
+int oneHour = 3600; // 60 seconds x 60 minutes = 1 hour
+int oneDay = 86400; // oneHour * 24;
 
 int init()
 {
@@ -199,29 +199,14 @@ int start()
       i--;      
    }
    
-   Comment(iBarShift(NULL, 0, lastNewYorkSession));
-   
    if (showFutureSessions) {
-      if (DayOfWeek() == 1) { // if on a Monday, weekends throw things out
-         drawFutureSession(lastSydneySession + oneDay, "Sydney open");
-         drawFutureSession(lastTokyoSession + oneDay - oneHour * (MathAbs(sydney - tokyo)), "Tokyo open");
-         drawFutureSession(lastLondonSession + oneDay - oneHour * (MathAbs(sydney - london)), "London open");
-         drawFutureSession(lastSydneySession + oneDay - oneHour * (MathAbs(sydney - newyork)), "New York open");
-      } else {
-         drawFutureSession(lastSydneySession + oneDay, "Sydney open");
-         drawFutureSession(lastTokyoSession + oneDay, "Tokyo open");
-         drawFutureSession(lastLondonSession + oneDay, "London open");
-         drawFutureSession(lastNewYorkSession + oneDay, "New York open");
-      } 
+	  drawVerticalLine(prefix + "future_line_sydney", lastSydneySession + oneDay, 1, futureSessionColour, 4, true, "Sydney open");
+	  drawVerticalLine(prefix + "future_line_tokyo", lastTokyoSession + oneDay, 1, futureSessionColour, 4, true, "Tokyo open");
+	  drawVerticalLine(prefix + "future_line_london", lastLondonSession + oneDay, 1, futureSessionColour, 4, true, "London open");
+	  drawVerticalLine(prefix + "future_line_newyork", lastNewYorkSession + oneDay, 1, futureSessionColour, 4, true, "New York open");
    }
 
    return(0);
-}
-
-void drawFutureSession(datetime prevSession, string label) 
-{
-   datetime futureTime = prevSession;
-   drawVerticalLine(prefix + "future_line" + prevSession, futureTime, 1, futureSessionColour, 4, true, label);
 }
 
 void drawVerticalLine(string name, datetime time, int thickness, color colour, int style, bool background, string label = "") 
