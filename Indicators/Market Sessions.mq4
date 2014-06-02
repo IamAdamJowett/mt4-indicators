@@ -4,7 +4,7 @@
    NAME: Market Sessions.mq4
    
    AUTHOR: Adam Jowett
-   VERSION: 1.2.1
+   VERSION: 1.2.2
    DATE: 02 June 2014
    METAQUOTES LANGUAGE VERSION: 4.0
    UPDATES & MORE DETAILED DOCUMENTATION AT: 
@@ -202,6 +202,7 @@ int start()
    Comment(iBarShift(NULL, 0, lastNewYorkSession));
    
    if (showFutureSessions) {
+      /**\/
       if (DayOfWeek() == 1) { // if on a Monday, weekends throw things out
          drawFutureSession(lastSydneySession + oneDay, "Sydney open");
          drawFutureSession(lastTokyoSession + oneDay - oneHour * (MathAbs(sydney - tokyo)), "Tokyo open");
@@ -213,6 +214,12 @@ int start()
          drawFutureSession(lastLondonSession + oneDay, "London open");
          drawFutureSession(lastNewYorkSession + oneDay, "New York open");
       } 
+      /**/
+      
+      drawFutureSession(lastSydneySession + oneDay, "Sydney open");
+      drawFutureSession(lastTokyoSession + oneDay, "Tokyo open");
+      drawFutureSession(lastLondonSession + oneDay, "London open");
+      drawFutureSession(lastNewYorkSession + oneDay, "New York open");
    }
 
    return(0);
