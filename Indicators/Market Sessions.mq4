@@ -5,7 +5,7 @@
    
    AUTHOR: Adam Jowett
    VERSION: 1.2.2
-   DATE: 02 June 2014
+   DATE: 14 June 2014
    METAQUOTES LANGUAGE VERSION: 4.0
    UPDATES & MORE DETAILED DOCUMENTATION AT: 
    http://adamjowett.com/2014/05/market-sessions-indicator-new/
@@ -34,7 +34,7 @@
    SOFTWARE.
 */
 
-#property copyright "Copyright Â© 2014, Adam Jowett"
+#property copyright "Copyright © 2014, Adam Jowett"
 #property link      "http://adamjowett.com"
 
 #property indicator_chart_window
@@ -61,6 +61,7 @@ int lastTokyoSession = -1;
 int lastLondonSession = -1;
 int lastNewYorkSession = -1;
 int sessionLength = 0;
+double gmtOffset = 0;
 int oneHour = 3600; // 60 seconds x 60 minutes = 1 hour
 int oneDay = 86400; // oneHour * 24;
 
@@ -211,9 +212,11 @@ int start()
 
 void drawVerticalLine(string name, datetime time, int thickness, color colour, int style, bool background, string label = "") 
 { 
+   long current_chart_id=ChartID();
+   
    if (ObjectFind(name) != 0) 
    {
-      ObjectCreate(name, OBJ_VLINE, 0, time, 0);
+      ObjectCreate(current_chart_id, name, OBJ_VLINE, 0, time, 0);
    } 
    else 
    { 
