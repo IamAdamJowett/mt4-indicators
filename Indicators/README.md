@@ -1,4 +1,4 @@
-# Market Sessions
+# Market Sessions Indicator
 ![Market Session Screenshot](http://adamjowett.com/wp-content/uploads/2014/05/market_sessions.png)
 
 The Market Sessions indicator is an indicator for the [Metatrader 4](http://www.metatrader4.com/) and [Metatrader 5](http://www.metatrader5.com/) platforms that has the following features (and more):
