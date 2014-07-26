@@ -12,6 +12,7 @@ The Market Sessions indicator is an indicator for the [Metatrader 4](http://www.
 - Show lines on smaller timeframes only
 - Hide individual session lines
 - Show vertical line on main window, or all windows including indicators
+- Change line styles
 - Change line colours
 
 The indicator comes as is and is provided free of charge. Any issues please log them in the issue register, or in the comments on the [website](http://adamjowett.com/category/trading/downloads/).
