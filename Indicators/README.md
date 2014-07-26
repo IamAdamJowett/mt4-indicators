@@ -22,18 +22,18 @@ For detailed usage explanation refer to [this post](http://adamjowett.com/2012/0
 
 ## Changelog
 
-__26 July 2014 - v0.3.0
+__26 July 2014 - v0.3.0__
 - Added ability to hide vertical lines from indicator windows
 - Expanded labels to include GMT offset
 - Added ability to specify times down to the minute not just hour
 - Refined logical code
 
-__24 May 2014 - v0.2.1
+__24 May 2014 - v0.2.1__
 - Added future session lines
 - Added previous range lines
 - Added ability to specify maximum time frame to show indicator on
 - Small code refactoring
 - Misc bug fixes
 
-__19 Apr 2014 - v0.2.0
+__19 Apr 2014 - v0.2.0__
 - Initial release
