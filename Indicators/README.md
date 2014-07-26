@@ -1,7 +1,9 @@
 # Market Sessions
+![Market Session Screenshot](http://adamjowett.com/wp-content/uploads/2014/05/market_sessions.png)
 
 The Market Sessions indicator is an indicator for the [Metatrader 4](http://www.metatrader4.com/) and [Metatrader 5](http://www.metatrader5.com/) platforms that has the following features (and more):
 
+## Features
 - Show open times for each Forex session
 - Show open price for each Forex session
 - Show the previous sessions range
@@ -20,18 +22,18 @@ For detailed usage explanation refer to [this post](http://adamjowett.com/2012/0
 
 ## Changelog
 
-###26 July 2014 - v0.3.0
+__26 July 2014 - v0.3.0
 - Added ability to hide vertical lines from indicator windows
 - Expanded labels to include GMT offset
 - Added ability to specify times down to the minute not just hour
 - Refined logical code
 
-###24 May 2014 - v0.2.1
+__24 May 2014 - v0.2.1
 - Added future session lines
 - Added previous range lines
 - Added ability to specify maximum time frame to show indicator on
 - Small code refactoring
 - Misc bug fixes
 
-###19 Apr 2014 - v0.2.0
+__19 Apr 2014 - v0.2.0
 - Initial release
