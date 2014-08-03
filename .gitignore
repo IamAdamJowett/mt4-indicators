@@ -15,3 +15,23 @@
 *.zip
 *.rar
 *.dat
+/Indicators/Accelerator.mq4
+/Indicators/Accumulation.mq4
+/Indicators/Alligator.mq4
+/Indicators/ATR.mq4
+/Indicators/Awesome.mq4
+/Indicators/Bands.mq4
+/Indicators/OsMA.mq4
+/Indicators/Parabolic.mq4
+/Indicators/RSI.mq4
+/Indicators/Stochastic.mq4
+/Indicators/ZigZag.mq4
+/Indicators/Momentum.mq4
+/Indicators/MACD.mq4
+/Indicators/iExposure.mq4
+/Indicators/Ichimoku.mq4
+/Indicators/Heiken Ashi.mq4
+/Indicators/Custom Moving Averages.mq4
+/Indicators/CCI.mq4
+/Indicators/Bulls.mq4
+/Indicators/Bears.mq4
