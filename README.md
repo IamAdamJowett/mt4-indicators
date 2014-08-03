@@ -11,7 +11,7 @@ For more information on these and other trading related material, check out the 
 
 ##Changelog
 
-__03 Aug 2014__
+__03 Aug 2014 - Market Sessions v 0.4.0__
 - Added ability to colour labels
 - Added a parameter to limit the number of days to look at and draw
 - Refactored some code to clean up label variables
