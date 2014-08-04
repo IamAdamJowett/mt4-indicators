@@ -23,6 +23,10 @@ For detailed usage explanation refer to [this post](http://adamjowett.com/2012/0
 
 ## Changelog
 
+__04 Aug 2014 - v0.4.2__
+- Removed unneeded variables
+- Removed look back feature as it conflicts with previous range, plan to add back in later
+
 __04 Aug 2014 - v0.4.1__
 - Fixed future dates bug when on a Monday
 

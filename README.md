@@ -11,6 +11,10 @@ For more information on these and other trading related material, check out the 
 
 ##Changelog
 
+__04 Aug 2014 - Market Sessions v0.4.2__
+- Removed unneeded variables
+- Removed look back feature as it conflicts with previous range, plan to add back in later
+
 __04 Aug 2014 - Market Sessions v0.4.1__
 - Fixed future dates bug when on a Monday
 
