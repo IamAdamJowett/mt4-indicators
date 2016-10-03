@@ -1,7 +1,7 @@
 /*
    ________________________________________________________________________________
    
-   NAME: bsebase.mqh
+   NAME: bsemm.mqh
    
    AUTHOR: Adam Jowett
    VERSION: 1.0.0
@@ -41,36 +41,39 @@
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-bool hasBars(int minBars)
+double currentRisk()
   {
-   return (Bars > minBars);
+   return 0;
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-bool canTrade(double maxOrders)
+double getTradeSize(double distanceStop,double riskMax)
   {
-   return (OrdersTotal()<maxOrders);
+   double available=AccountEquity()*(riskMax/100);
+   double size=available/(distanceStop*_getPipValue());
+
+   Print("Stop distance: "+DoubleToString(distanceStop));
+   Print("Pip value: "+DoubleToString(_getPipValue()));
+   Print("Stop value: "+DoubleToString((distanceStop*_getPipValue())));
+   Print("Funds available: "+DoubleToString(available));
+   Print("Trade size: "+DoubleToString(size));
+
+   return 0.1;
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-void PrintM(string msg)
+double _getPipValue()
   {
-   Print("[LOG] "+msg);
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-void PrintW(string msg)
-  {
-   Print("[WARNING] "+msg);
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-void PrintE(string msg)
-  {
-   Print("[ERROR] "+msg);
+   double point=Point;
+   int LotSize=1;
+   if((Digits==3) || (Digits==5))
+     {
+      point*=10;
+     }
+   string DepositCurrency=AccountInfoString(ACCOUNT_CURRENCY);
+
+   return (((MarketInfo(Symbol(),MODE_TICKVALUE) * point)/MarketInfo(Symbol(),MODE_TICKSIZE))*LotSize);
   }
 //+------------------------------------------------------------------+

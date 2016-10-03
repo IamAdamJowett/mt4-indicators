@@ -34,8 +34,8 @@
    SOFTWARE.
 */
 
-#property copyright "Copyright 2016, Buy Sell Eat and Adam Jowett."
-#property link      "https://www.buyselleat.com"
+#property copyright "Copyright 2016, Adam Jowett (Buy Sell Eat)."
+#property link      "http://www.adamjowett.com"
 #property strict
 
 //+------------------------------------------------------------------+

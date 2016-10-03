@@ -1,7 +1,7 @@
 /*
    ________________________________________________________________________________
    
-   NAME: bsebase.mqh
+   NAME: bsetrade.mqh
    
    AUTHOR: Adam Jowett
    VERSION: 1.0.0
@@ -41,36 +41,105 @@
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-bool hasBars(int minBars)
+int buyMarket(double tradingLots,double stopLoss,double takeProfit,int expiration=0,color tradeColor=Green)
   {
-   return (Bars > minBars);
+   int ticket=OrderSend(Symbol(),OP_BUY,tradingLots,Ask,3,stopLoss,takeProfit,"Buy market trade",16384,expiration,tradeColor);
+   if(ticket>0)
+     {
+      if(OrderSelect(ticket,SELECT_BY_TICKET,MODE_TRADES))
+        {
+         Print("BUY order opened : ",OrderOpenPrice());
+        }
+      return ticket;
+     }
+   else
+     {
+      Print("Error opening BUY order : ",GetLastError());
+      return 0;
+     }
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-bool canTrade(double maxOrders)
+int sellMarket(double tradingLots,double stopLoss,double takeProfit,int expiration=0,color tradeColor=Red)
   {
-   return (OrdersTotal()<maxOrders);
+   int ticket=OrderSend(Symbol(),OP_SELL,tradingLots,Bid,3,stopLoss,takeProfit,"Sell market trade",16384,expiration,tradeColor);
+   if(ticket>0)
+     {
+      if(OrderSelect(ticket,SELECT_BY_TICKET,MODE_TRADES))
+        {
+         Print("SELL order opened : ",OrderOpenPrice());
+        }
+      return ticket;
+     }
+   else
+     {
+      Print("Error opening SELL order : ",GetLastError());
+      return 0;
+     }
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-void PrintM(string msg)
+int closeAllBuys()
   {
-   Print("[LOG] "+msg);
+   for(int i=0;i<OrdersTotal();i++)
+     {
+      if(!OrderSelect(i,SELECT_BY_POS,MODE_TRADES))
+        {
+         // could not find the order
+         Print("[ERROR] Could not find the order to monitor stop loss");
+         continue;
+        }
+
+      // if there is an open sell trade of this symbol
+      if(OrderType()==OP_BUY && OrderSymbol()==Symbol())
+        {
+         int closeID=OrderClose(OrderTicket(),OrderLots(),Bid,3,Blue);
+
+         if(!closeID)
+           {
+            Print("[ERROR] Could not close all buy trades | " + IntegerToString(GetLastError()));
+            return -1;
+           }
+         else
+           {
+            return closeID;
+           }
+        }
+     }
+   return -1;
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-void PrintW(string msg)
+int closeAllSells()
   {
-   Print("[WARNING] "+msg);
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-void PrintE(string msg)
-  {
-   Print("[ERROR] "+msg);
+   for(int i=0;i<OrdersTotal();i++)
+     {
+      if(!OrderSelect(i,SELECT_BY_POS,MODE_TRADES))
+        {
+         // could not find the order
+         Print("[ERROR] Could not find the order to monitor stop loss");
+         continue;
+        }
+
+      // if there is an open sell trade of this symbol
+      if(OrderType()==OP_SELL && OrderSymbol()==Symbol())
+        {
+         int closeID=OrderClose(OrderTicket(),OrderLots(),Ask,3,Blue);
+
+         if(!closeID)
+           {
+            Print("[ERROR] Could not close all sell trades | " + IntegerToString(GetLastError()));
+            return -1;
+           }
+         else
+           {
+            return closeID;
+           }
+        }
+     }
+   return -1;
   }
 //+------------------------------------------------------------------+
