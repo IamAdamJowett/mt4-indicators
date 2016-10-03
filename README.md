@@ -6,10 +6,21 @@ For more information on these and other trading related material, check out the 
 ##Indicators
 - Market Sessions
 
+##Includes
+- Base
+- Bars
+- Money Management
+- Trades
+
 ##Scripts
 - None
 
 ##Changelog
+
+__03 Oct 2016 - Includes__
+- Added in money mangement functions
+- Added in trade functions
+- Documented what each function does in bsebars
 
 __04 Aug 2014 - Market Sessions v0.4.2__
 - Removed unneeded variables
