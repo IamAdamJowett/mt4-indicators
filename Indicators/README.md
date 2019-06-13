@@ -23,6 +23,11 @@ For detailed usage explanation refer to [this post](http://adamjowett.com/2012/0
 
 ## Changelog
 
+__13 June 2019 - v2.1.2__
+- Added ability to show Pivots
+- Added ability to show weekly start
+- Other bug fixes
+
 __04 Aug 2014 - v0.4.2__
 - Removed unneeded variables
 - Removed look back feature as it conflicts with previous range, plan to add back in later
