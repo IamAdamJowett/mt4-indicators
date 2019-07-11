@@ -1,7 +1,7 @@
 //+------------------------------------------------------------------+
 //|                           Market Sessions Metatrader 4 Indicator |
 //|                                  Copyright 2016-2019 Adam Jowett |
-//|                                       https://www.100incomes.com |
+//|                                       https://www.buyselleat.com |
 //+------------------------------------------------------------------+
 
 /*
@@ -10,17 +10,17 @@
    NAME: Market Sessions.mq4
    
    AUTHOR: Adam Jowett
-   VERSION: 2.1.2
-   DATE: 13 June 2019
+   VERSION: 2.2.0
+   DATE: 09 July 2019
    METAQUOTES LANGUAGE VERSION: 4.0
    UPDATES & MORE DETAILED DOCUMENTATION AT: 
-   https://www.100incomes.com/trading/
+   https://www.buyselleat.com/trading/
    ________________________________________________________________________________
 
    LICENCE:
 
-   adamjowett.com Source Code License Agreement	  
-   Copyright (c) 2016 adamjowett.com
+   buyselleat.com Source Code License Agreement	  
+   Copyright (c) 2019 buyselleat.com
 
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -43,45 +43,47 @@
    SOFTWARE.
    */
 
-#property copyright "Copyright © 2016-2019, Adam Jowett"
-#property link      "https://100incomes.com"
+#property copyright "Copyright © 2014-2019, Buy Sell Eat"
+#property link      "https://buyselleat.com"
+#property strict
 
 #property indicator_chart_window
 
-extern int              gmtServerOffset = 2;
-extern bool             showSydney = true;
-extern bool             showTokyo = false;
-extern bool             showLondon = false;
-extern bool             showNewYork = false;
-extern bool             showPivot = true;
-extern bool             showRandS = true;
-extern bool             showOpenPrice = false;
-extern bool             showLabels = true;
-extern bool             showWeekStart = true;
-extern ENUM_TIMEFRAMES  pivotLength = PERIOD_D1;
-extern color            pivotColour = RoyalBlue;
-extern color            srColour = DimGray;
-extern color            openColour = LimeGreen;
-extern color            closeColour = Red;
-extern color            tokyoColour = DeepSkyBlue;
-extern color            sydneyColour = Plum;
-extern color            londonColour = Magenta;
-extern color            newYorkColour = Gold;
-extern color            weekColour = DarkSlateGray;
-extern int              sydney = 22;
-extern int              tokyo = 0;
-extern int              london = 7;
-extern int              newyork = 12;
-extern int              verticalShift = 0;
+input int              gmtServerOffset = 2;          // Broker GMT Offset
+input bool             showSydney = true;            // Show Sydney open
+input bool             showTokyo = false;            // Show Tokyo open
+input bool             showLondon = false;           // Show London open
+input bool             showNewYork = false;          // Show New York open
+input bool             showPivot = true;             // Show Pivot
+input bool             showRandS = true;             // Show Pivot resistance & support
+input bool             showOpenPrice = false;        // Show session open price
+input bool             showLabels = true;            // Show object labels
+input bool             showWeekStart = true;         // Show weekly open price
+input ENUM_TIMEFRAMES  pivotLength = PERIOD_D1;      // Define line length for pivots
+input color            pivotColour = RoyalBlue;      // Pivot line colour
+input color            srColour = DimGray;           // Pivot Support & resistance line colour
+input color            openColour = LimeGreen;       // Open price line colour
+input color            closeColour = Red;            // Close price line colour
+input color            tokyoColour = DeepSkyBlue;    // Tokyo session line colour
+input color            sydneyColour = Plum;          // Sydney session line colour
+input color            londonColour = Magenta;       // London session line colour
+input color            newYorkColour = Gold;         // New york session line colour
+input color            weekColour = DarkSlateGray;   // Weekly line colour
+
+int                     sydney = 22;                
+int                     tokyo = 0;
+int                     london = 7;
+int                     newyork = 12;
+int                     verticalShift = 0;
 
 string   prefix="market_sessions_";
 int      sessionLength,dayLength,lastDayNumber;
 double   pivots[7],lastDrawnPivot;
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-int init()
+
+int OnInit()
   {
+   IndicatorShortName("Market Sessions"); 
+  
    sessionLength=Period()*60 *((60/Period())*9);
    dayLength=Period()*60 *((60/Period())*24);
 
@@ -115,70 +117,91 @@ int init()
 
    return(0);
   }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-int deinit()
+
+
+void OnDeinit(const int reason)
   {
-   clearScreen(prefix,true,NULL);
-   return(0);
+   switch(reason)
+   {
+      case REASON_CHARTCHANGE :
+      case REASON_RECOMPILE   :
+      case REASON_CLOSE       : break;
+      default :
+      {
+         clearScreen(prefix,true,NULL);
+      }                  
+   }
   }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-int start()
-  {
-   if(Bars <= 10) return(0);
 
-   int counted=IndicatorCounted();
-   if (counted < 0) return(-1);
-   if (counted>0) counted--;
 
-   int i=Bars-counted;
-   
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime &time[],
+                const double &open[],
+                const double &high[],
+                const double &low[],
+                const double &close[],
+                const long &tick_volume[],
+                const long &volume[],
+                const int &spread[])
+  {  
+ 
    if(Period()>60) // don't show on timeframes above hourly as lines will be too bunched together
      {
       clearScreen(prefix,true,NULL);
       return(0);
      }
 
-   bool sydneyFound=false,tokyoFound=false; // tricky sessions due to them falling on a Sunday on some brokers
-
-   while(i>=0)
-     {
-      int dayNumber=TimeDayOfWeek(Time[i]);
-      int hr=TimeHour(Time[i]);
-      int min=TimeMinute(Time[i]);
+   ArraySetAsSeries(open,false);
+   ArraySetAsSeries(close,false);
+   ArraySetAsSeries(time,false);
+   
+   datetime currentTime = time[0];
+   double currentOpen = open[0];
+   double prevOpen = open[1];
+   double currentClose = close[0];
+   double prevClose = close[1];
+   int dayNumber = 0;
+   int hr = 0;
+   int min = 0;
+   int i = 1;
+   
+   while(i<rates_total-1)
+     {    
+      currentTime = time[i];
+      currentOpen = open[i];
+      currentClose = close[i];
+      prevOpen = open[i+1];
+      prevClose = close[i+1];
+      
+      dayNumber=TimeDayOfWeek(currentTime);
+      hr=TimeHour(currentTime);
+      min=TimeMinute(currentTime);
+      
+      string objectIndex = IntegerToString(i);
         
       if(lastDayNumber-dayNumber<0) // start of a new day
         {
          if(showWeekStart && dayNumber==1)
            {
-            drawVerticalLine(prefix+"weekly_open_line"+i,Time[i],1,weekColour,3,true,"Weekly open");
+            drawVerticalLine(prefix+"weekly_open_line"+objectIndex,currentTime,1,weekColour,3,true,"Weekly open");
             if(showOpenPrice)
               {
-               drawBox(prefix+"week_open_range"+i,Time[i],Time[i]+dayLength*5,Open[i],Close[i+1],weekColour,false,true);
+               drawBox(prefix+"week_open_range"+objectIndex,currentTime,currentTime+dayLength*5,currentOpen,prevClose,weekColour,false,true);
               }
            }
         }
 
       lastDayNumber=dayNumber;
 
-      if(((hr==sydney) || (hr<london && hr>sydney && !sydneyFound)) && min==0)
+      if((hr==sydney && min==0) && showSydney)
         {
-         sydneyFound=true;
-
-         if(showSydney)
-           {
-            drawVerticalLine(prefix+"sydneyTimeOpen"+i,Time[i],1,sydneyColour,3,true,"Sydney open");
-            if(showOpenPrice) drawTrendLine(prefix+"sydneyopen"+i,Time[i],Time[i]+sessionLength,Open[i],Open[i],1,sydneyColour,4,true,false,"Open ["+DoubleToStr(Open[i],Digits)+"]");
-           }
+           drawVerticalLine(prefix+"sydneyTimeOpen"+objectIndex,currentTime,1,sydneyColour,3,true,"Sydney open");
+           if(showOpenPrice) drawTrendLine(prefix+"sydneyopen"+objectIndex,currentTime,currentTime+sessionLength,currentOpen,currentOpen,1,sydneyColour,4,true,false,"Open ["+DoubleToStr(currentOpen,Digits)+"]");
            
            if((showPivot || showRandS) && pivotLength>=PERIOD_D1)
            {
-            //---
-            //Print("Doing Pivot Calculation for day " + dayNumber);
-            doPivotCalculations(iBarShift(Symbol(),pivotLength,Time[i])+1,pivotLength);
+            doPivotCalculations(iBarShift(Symbol(),pivotLength,currentTime)+1,pivotLength);
 
             string pivotPrefix;
             int pivotDrawLength=dayLength;
@@ -202,11 +225,11 @@ int start()
                  
                if(lastDrawnPivot!=pivots[3])
                  {
-                  drawTrendLine(prefix+"market_sessions_pivot"+i,Time[i],Time[i]+pivotDrawLength,pivots[3],pivots[3],1,pivotColour,4,true,false,pivotPrefix+"Pivot ["+DoubleToStr(pivots[3],Digits)+"]");
+                  drawTrendLine(prefix+"market_sessions_pivot"+objectIndex,currentTime,currentTime+pivotDrawLength,pivots[3],pivots[3],1,pivotColour,4,true,false,pivotPrefix+"Pivot ["+DoubleToStr(pivots[3],Digits)+"]");
                  }
                else
                  {
-                  drawTrendLine(prefix+"market_sessions_pivot"+i,Time[i],Time[i]+pivotDrawLength,pivots[3],pivots[3],1,pivotColour,4,true,false,"");
+                  drawTrendLine(prefix+"market_sessions_pivot"+objectIndex,currentTime,currentTime+pivotDrawLength,pivots[3],pivots[3],1,pivotColour,4,true,false,"");
                  }
 
                // store the pivot value to see if we have changed days/weeks/months for labelling purposes
@@ -215,50 +238,37 @@ int start()
 
             if(showRandS)
               {
-               drawTrendLine(prefix+"dailyr3"+i,Time[i],Time[i]+dayLength,pivots[0],pivots[0],1,srColour,4,true,false,pivotPrefix+"R3 ["+DoubleToStr(pivots[0],Digits)+"]");
-               drawTrendLine(prefix+"dailyr2"+i,Time[i],Time[i]+dayLength,pivots[1],pivots[1],1,srColour,4,true,false,pivotPrefix+"R2 ["+DoubleToStr(pivots[1],Digits)+"]");
-               drawTrendLine(prefix+"dailyr1"+i,Time[i],Time[i]+dayLength,pivots[2],pivots[2],1,srColour,4,true,false,pivotPrefix+"R1 ["+DoubleToStr(pivots[2],Digits)+"]");
-               drawTrendLine(prefix+"dailys1"+i,Time[i],Time[i]+dayLength,pivots[4],pivots[4],1,srColour,4,true,false,pivotPrefix+"S1 ["+DoubleToStr(pivots[4],Digits)+"]");
-               drawTrendLine(prefix+"dailys2"+i,Time[i],Time[i]+dayLength,pivots[5],pivots[5],1,srColour,4,true,false,pivotPrefix+"S2 ["+DoubleToStr(pivots[5],Digits)+"]");
-               drawTrendLine(prefix+"dailys3"+i,Time[i],Time[i]+dayLength,pivots[6],pivots[6],1,srColour,4,true,false,pivotPrefix+"S3 ["+DoubleToStr(pivots[6],Digits)+"]");
+               drawTrendLine(prefix+"dailyr3"+objectIndex,currentTime,currentTime+dayLength,pivots[0],pivots[0],1,srColour,4,true,false,pivotPrefix+"R3 ["+DoubleToStr(pivots[0],Digits)+"]");
+               drawTrendLine(prefix+"dailyr2"+objectIndex,currentTime,currentTime+dayLength,pivots[1],pivots[1],1,srColour,4,true,false,pivotPrefix+"R2 ["+DoubleToStr(pivots[1],Digits)+"]");
+               drawTrendLine(prefix+"dailyr1"+objectIndex,currentTime,currentTime+dayLength,pivots[2],pivots[2],1,srColour,4,true,false,pivotPrefix+"R1 ["+DoubleToStr(pivots[2],Digits)+"]");
+               drawTrendLine(prefix+"dailys1"+objectIndex,currentTime,currentTime+dayLength,pivots[4],pivots[4],1,srColour,4,true,false,pivotPrefix+"S1 ["+DoubleToStr(pivots[4],Digits)+"]");
+               drawTrendLine(prefix+"dailys2"+objectIndex,currentTime,currentTime+dayLength,pivots[5],pivots[5],1,srColour,4,true,false,pivotPrefix+"S2 ["+DoubleToStr(pivots[5],Digits)+"]");
+               drawTrendLine(prefix+"dailys3"+objectIndex,currentTime,currentTime+dayLength,pivots[6],pivots[6],1,srColour,4,true,false,pivotPrefix+"S3 ["+DoubleToStr(pivots[6],Digits)+"]");
               }
            }
         }
-      else if(((hr==tokyo) || (hr<london && hr>tokyo && !tokyoFound)) && min==0)
+      else if((hr==tokyo && min==0) && showTokyo)
         {
-         tokyoFound=true;
-
-         if(showTokyo)
-           {
-            drawVerticalLine(prefix+"line"+i,Time[i],1,tokyoColour,3,true,"Tokyo open");
-            if(showOpenPrice) drawTrendLine(prefix+"tokyoopen"+i,Time[i],Time[i]+sessionLength,Open[i],Open[i],1,tokyoColour,4,true,false,DoubleToStr(Open[i],Digits));
-           }
+          drawVerticalLine(prefix+"line"+objectIndex,currentTime,1,tokyoColour,3,true,"Tokyo open");
+          if(showOpenPrice) drawTrendLine(prefix+"tokyoopen"+objectIndex,currentTime,currentTime+sessionLength,currentOpen,currentOpen,1,tokyoColour,4,true,false,DoubleToStr(currentOpen,Digits));
         }
       else if((hr==london && min==0) && showLondon)
         {
-         drawVerticalLine(prefix+"line"+i,Time[i],1,londonColour,3,true,"London open");
-         if(showOpenPrice) drawTrendLine(prefix+"londonoopen"+i,Time[i],Time[i]+sessionLength,Open[i],Open[i],1,londonColour,4,true,false,DoubleToStr(Open[i],Digits));
+         drawVerticalLine(prefix+"line"+objectIndex,currentTime,1,londonColour,3,true,"London open");
+         if(showOpenPrice) drawTrendLine(prefix+"londonoopen"+objectIndex,currentTime,currentTime+sessionLength,currentOpen,currentOpen,1,londonColour,4,true,false,DoubleToStr(currentOpen,Digits));
         }
-      else if((hr==newyork && min==0))
+      else if((hr==newyork && min==0) && showNewYork)
         {
-         sydneyFound=false;
-         tokyoFound=false;
-
-         if(showNewYork)
-           {
-            drawVerticalLine(prefix+"line"+i,Time[i],1,newYorkColour,3,true,"New York open");
-            if(showOpenPrice) drawTrendLine(prefix+"newyorkopen"+i,Time[i],Time[i]+sessionLength,Open[i],Open[i],1,newYorkColour,4,true,false,DoubleToStr(Open[i],Digits));
-           }
+          drawVerticalLine(prefix+"line"+objectIndex,currentTime,1,newYorkColour,3,true,"New York open");
+          if(showOpenPrice) drawTrendLine(prefix+"newyorkopen"+objectIndex,currentTime,currentTime+sessionLength,currentOpen,currentOpen,1,newYorkColour,4,true,false,DoubleToStr(currentOpen,Digits));
         }
 
-      i--;
+       i++;
      }
 
    return(0);
   }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+
 void doPivotCalculations(int index,int period=PERIOD_D1)
   {
    pivots[3] = NormalizeDouble(((iHigh(Symbol(),period,index)+iLow(Symbol(),period,index)+iClose(Symbol(),period,index))/3),Digits); // pivot
@@ -280,14 +290,12 @@ void doPivotCalculations(int index,int period=PERIOD_D1)
       Comment("Vertical shift active");
      }
   }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-void drawVerticalLine(string name,double time,int thickness,color colour,int style,bool background,string label="")
+
+void drawVerticalLine(string name,datetime time,int thickness,color colour,int style,bool background,string label="")
   {
    if(ObjectFind(name)!=0)
      {
-      ObjectCreate(name,OBJ_VLINE,0,time,0);
+      ObjectCreate(name,OBJ_VLINE,0,time,0.00);
      }
    else
      {
@@ -301,10 +309,8 @@ void drawVerticalLine(string name,double time,int thickness,color colour,int sty
 
    ObjectSetText(name,label,8,"Arial",colour);
   }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-void drawTrendLine(string name,double time1,double time2,double price1,double price2,int thickness,color colour,int style,bool background,bool ray,string label="")
+
+void drawTrendLine(string name,datetime time1,datetime time2,double price1,double price2,int thickness,color colour,int style,bool background,bool ray,string label="")
   {
    if(ObjectFind(name)!=0)
      {
@@ -324,12 +330,11 @@ void drawTrendLine(string name,double time1,double time2,double price1,double pr
    ObjectSet(name,OBJPROP_WIDTH,thickness);
    ObjectSet(name,OBJPROP_BACK,background);
    ObjectSet(name,OBJPROP_STYLE,style);
+   
    if(showLabels) ObjectSetText(name,label,8);
   }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-void drawBox(string name,double time1,double time2,double price1,double price2,color colour,bool borderOnly=false,bool background=true)
+
+void drawBox(string name,datetime time1,datetime time2,double price1,double price2,color colour,bool borderOnly=false,bool background=true)
   {
    if(ObjectFind(name)!=0)
      {
@@ -347,17 +352,13 @@ void drawBox(string name,double time1,double time2,double price1,double price2,c
    ObjectSet(name,OBJPROP_BACK,(borderOnly) ? false : background);
    ObjectSet(name,OBJPROP_BORDER_TYPE,0);
   }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+
 string getDayName(int dayNumber)
   {
    string days[7]={"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};
    return (days[dayNumber]);
   }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
+
 void clearScreen(string pref,bool clearComments,string exception)
   {
    if(clearComments) Comment("");
@@ -374,4 +375,3 @@ void clearScreen(string pref,bool clearComments,string exception)
         }
      }
   }
-//+------------------------------------------------------------------+
