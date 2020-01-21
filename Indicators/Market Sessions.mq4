@@ -10,8 +10,8 @@
    NAME: Market Sessions.mq4
    
    AUTHOR: Adam Jowett
-   VERSION: 2.2.0
-   DATE: 09 July 2019
+   VERSION: 2.3.0
+   DATE: 21 Jan 2020
    METAQUOTES LANGUAGE VERSION: 4.0
    UPDATES & MORE DETAILED DOCUMENTATION AT: 
    https://www.buyselleat.com/trading/
@@ -43,7 +43,7 @@
    SOFTWARE.
    */
 
-#property copyright "Copyright © 2014-2019, Buy Sell Eat"
+#property copyright "Copyright © 2014-2020, Buy Sell Eat"
 #property link      "https://buyselleat.com"
 #property strict
 
@@ -55,26 +55,29 @@ input bool             showTokyo = false;            // Show Tokyo open
 input bool             showLondon = false;           // Show London open
 input bool             showNewYork = false;          // Show New York open
 input bool             showPivot = true;             // Show Pivot
-input bool             showRandS = true;             // Show Pivot resistance & support
+input bool             showRandS = true;             // Show Pivot Resistance & Support
 input bool             showOpenPrice = false;        // Show session open price
 input bool             showLabels = true;            // Show object labels
 input bool             showWeekStart = true;         // Show weekly open price
+input bool             showDayNames = true;          // Show day names
 input ENUM_TIMEFRAMES  pivotLength = PERIOD_D1;      // Define line length for pivots
-input color            pivotColour = RoyalBlue;      // Pivot line colour
-input color            srColour = DimGray;           // Pivot Support & resistance line colour
-input color            openColour = LimeGreen;       // Open price line colour
-input color            closeColour = Red;            // Close price line colour
-input color            tokyoColour = DeepSkyBlue;    // Tokyo session line colour
-input color            sydneyColour = Plum;          // Sydney session line colour
-input color            londonColour = Magenta;       // London session line colour
-input color            newYorkColour = Gold;         // New york session line colour
-input color            weekColour = DarkSlateGray;   // Weekly line colour
+input color            pivotColour = clrRoyalBlue;      // Pivot line colour
+input color            srColour = clrDimGray;           // Pivot Support & Resistance colour
+input color            openColour = clrLimeGreen;       // Open price colour
+input color            closeColour = clrRed;            // Close price colour
+input color            tokyoColour = clrDeepSkyBlue;    // Tokyo session colour
+input color            sydneyColour = clrPlum;          // Sydney session colour
+input color            londonColour = clrMagenta;       // London session colour
+input color            newYorkColour = clrGold;         // New york session colour
+input color            weekColour = clrDarkSlateGray;   // Weekly line colour
 
 int                     sydney = 22;                
 int                     tokyo = 0;
 int                     london = 7;
 int                     newyork = 12;
 int                     verticalShift = 0;
+
+string                  dayNames[7] = {"SUN","MON","TUE","WED","THU","FRI","SAT"};
 
 string   prefix="market_sessions_";
 int      sessionLength,dayLength,lastDayNumber;
@@ -179,12 +182,18 @@ int OnCalculate(const int rates_total,
       min=TimeMinute(currentTime);
       
       string objectIndex = IntegerToString(i);
+      string labelSuffix = "";
+      
+      if (showDayNames) 
+        {
+         labelSuffix = " [" + getDayName(dayNumber)  + "]";
+        } 
         
       if(lastDayNumber-dayNumber<0) // start of a new day
         {
          if(showWeekStart && dayNumber==1)
            {
-            drawVerticalLine(prefix+"weekly_open_line"+objectIndex,currentTime,1,weekColour,3,true,"Weekly open");
+            drawVerticalLine(prefix+"weekly_open_line"+objectIndex,currentTime,1,weekColour,3,true,"Weekly open" + labelSuffix);
             if(showOpenPrice)
               {
                drawBox(prefix+"week_open_range"+objectIndex,currentTime,currentTime+dayLength*5,currentOpen,prevClose,weekColour,false,true);
@@ -196,7 +205,7 @@ int OnCalculate(const int rates_total,
 
       if((hr==sydney && min==0) && showSydney)
         {
-           drawVerticalLine(prefix+"sydneyTimeOpen"+objectIndex,currentTime,1,sydneyColour,3,true,"Sydney open");
+           drawVerticalLine(prefix+"sydneyTimeOpen"+objectIndex,currentTime,1,sydneyColour,3,true,"Sydney open" + labelSuffix);
            if(showOpenPrice) drawTrendLine(prefix+"sydneyopen"+objectIndex,currentTime,currentTime+sessionLength,currentOpen,currentOpen,1,sydneyColour,4,true,false,"Open ["+DoubleToStr(currentOpen,Digits)+"]");
            
            if((showPivot || showRandS) && pivotLength>=PERIOD_D1)
@@ -225,7 +234,7 @@ int OnCalculate(const int rates_total,
                  
                if(lastDrawnPivot!=pivots[3])
                  {
-                  drawTrendLine(prefix+"market_sessions_pivot"+objectIndex,currentTime,currentTime+pivotDrawLength,pivots[3],pivots[3],1,pivotColour,4,true,false,pivotPrefix+"Pivot ["+DoubleToStr(pivots[3],Digits)+"]");
+                  drawTrendLine(prefix+"market_sessions_pivot"+objectIndex,currentTime,currentTime+pivotDrawLength,pivots[3],pivots[3],1,pivotColour,4,true,false,pivotPrefix+"Pivot ["+DoubleToStr(pivots[3],Digits)+"]"+labelSuffix);
                  }
                else
                  {
@@ -238,28 +247,28 @@ int OnCalculate(const int rates_total,
 
             if(showRandS)
               {
-               drawTrendLine(prefix+"dailyr3"+objectIndex,currentTime,currentTime+dayLength,pivots[0],pivots[0],1,srColour,4,true,false,pivotPrefix+"R3 ["+DoubleToStr(pivots[0],Digits)+"]");
-               drawTrendLine(prefix+"dailyr2"+objectIndex,currentTime,currentTime+dayLength,pivots[1],pivots[1],1,srColour,4,true,false,pivotPrefix+"R2 ["+DoubleToStr(pivots[1],Digits)+"]");
-               drawTrendLine(prefix+"dailyr1"+objectIndex,currentTime,currentTime+dayLength,pivots[2],pivots[2],1,srColour,4,true,false,pivotPrefix+"R1 ["+DoubleToStr(pivots[2],Digits)+"]");
-               drawTrendLine(prefix+"dailys1"+objectIndex,currentTime,currentTime+dayLength,pivots[4],pivots[4],1,srColour,4,true,false,pivotPrefix+"S1 ["+DoubleToStr(pivots[4],Digits)+"]");
-               drawTrendLine(prefix+"dailys2"+objectIndex,currentTime,currentTime+dayLength,pivots[5],pivots[5],1,srColour,4,true,false,pivotPrefix+"S2 ["+DoubleToStr(pivots[5],Digits)+"]");
-               drawTrendLine(prefix+"dailys3"+objectIndex,currentTime,currentTime+dayLength,pivots[6],pivots[6],1,srColour,4,true,false,pivotPrefix+"S3 ["+DoubleToStr(pivots[6],Digits)+"]");
+               drawTrendLine(prefix+"dailyr3"+objectIndex,currentTime,currentTime+dayLength,pivots[0],pivots[0],1,srColour,4,true,false,pivotPrefix+"R3 ["+DoubleToStr(pivots[0],Digits)+"]"+labelSuffix);
+               drawTrendLine(prefix+"dailyr2"+objectIndex,currentTime,currentTime+dayLength,pivots[1],pivots[1],1,srColour,4,true,false,pivotPrefix+"R2 ["+DoubleToStr(pivots[1],Digits)+"]"+labelSuffix);
+               drawTrendLine(prefix+"dailyr1"+objectIndex,currentTime,currentTime+dayLength,pivots[2],pivots[2],1,srColour,4,true,false,pivotPrefix+"R1 ["+DoubleToStr(pivots[2],Digits)+"]"+labelSuffix);
+               drawTrendLine(prefix+"dailys1"+objectIndex,currentTime,currentTime+dayLength,pivots[4],pivots[4],1,srColour,4,true,false,pivotPrefix+"S1 ["+DoubleToStr(pivots[4],Digits)+"]"+labelSuffix);
+               drawTrendLine(prefix+"dailys2"+objectIndex,currentTime,currentTime+dayLength,pivots[5],pivots[5],1,srColour,4,true,false,pivotPrefix+"S2 ["+DoubleToStr(pivots[5],Digits)+"]"+labelSuffix);
+               drawTrendLine(prefix+"dailys3"+objectIndex,currentTime,currentTime+dayLength,pivots[6],pivots[6],1,srColour,4,true,false,pivotPrefix+"S3 ["+DoubleToStr(pivots[6],Digits)+"]"+labelSuffix);
               }
            }
         }
       else if((hr==tokyo && min==0) && showTokyo)
         {
-          drawVerticalLine(prefix+"line"+objectIndex,currentTime,1,tokyoColour,3,true,"Tokyo open");
+          drawVerticalLine(prefix+"line"+objectIndex,currentTime,1,tokyoColour,3,true,"Tokyo open" + labelSuffix);
           if(showOpenPrice) drawTrendLine(prefix+"tokyoopen"+objectIndex,currentTime,currentTime+sessionLength,currentOpen,currentOpen,1,tokyoColour,4,true,false,DoubleToStr(currentOpen,Digits));
         }
       else if((hr==london && min==0) && showLondon)
         {
-         drawVerticalLine(prefix+"line"+objectIndex,currentTime,1,londonColour,3,true,"London open");
+         drawVerticalLine(prefix+"line"+objectIndex,currentTime,1,londonColour,3,true,"London open" + labelSuffix);
          if(showOpenPrice) drawTrendLine(prefix+"londonoopen"+objectIndex,currentTime,currentTime+sessionLength,currentOpen,currentOpen,1,londonColour,4,true,false,DoubleToStr(currentOpen,Digits));
         }
       else if((hr==newyork && min==0) && showNewYork)
         {
-          drawVerticalLine(prefix+"line"+objectIndex,currentTime,1,newYorkColour,3,true,"New York open");
+          drawVerticalLine(prefix+"line"+objectIndex,currentTime,1,newYorkColour,3,true,"New York open" + labelSuffix);
           if(showOpenPrice) drawTrendLine(prefix+"newyorkopen"+objectIndex,currentTime,currentTime+sessionLength,currentOpen,currentOpen,1,newYorkColour,4,true,false,DoubleToStr(currentOpen,Digits));
         }
 
@@ -307,7 +316,7 @@ void drawVerticalLine(string name,datetime time,int thickness,color colour,int s
    ObjectSet(name,OBJPROP_BACK,background);
    ObjectSet(name,OBJPROP_STYLE,style);
 
-   ObjectSetText(name,label,8,"Arial",colour);
+   ObjectSetText(name,label,10,"Arial",colour);
   }
 
 void drawTrendLine(string name,datetime time1,datetime time2,double price1,double price2,int thickness,color colour,int style,bool background,bool ray,string label="")
