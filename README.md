@@ -16,6 +16,8 @@ For more information on these and other trading related material, check out the 
 - None
 
 ##Changelog
+__03 Oct 2016 - Market Sessions v2.3.1__
+- Added the ability to show day names
 
 __03 Oct 2016 - Includes__
 - Added in money mangement functions
