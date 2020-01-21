@@ -10,7 +10,7 @@
    NAME: Market Sessions.mq4
    
    AUTHOR: Adam Jowett
-   VERSION: 2.3.0
+   VERSION: 2.3.1
    DATE: 21 Jan 2020
    METAQUOTES LANGUAGE VERSION: 4.0
    UPDATES & MORE DETAILED DOCUMENTATION AT: 
@@ -76,8 +76,6 @@ int                     tokyo = 0;
 int                     london = 7;
 int                     newyork = 12;
 int                     verticalShift = 0;
-
-string                  dayNames[7] = {"SUN","MON","TUE","WED","THU","FRI","SAT"};
 
 string   prefix="market_sessions_";
 int      sessionLength,dayLength,lastDayNumber;
